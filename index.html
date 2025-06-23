@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor de Audio de Video</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #add8e6; /* Light blue background */
+        }
+        /* Custom styles for better visual appeal */
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            padding: 2.5rem;
+            max-width: 3xl; /* Max width for content */
+            width: 95%; /* Responsive width */
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca; /* Indigo 700 */
+        }
+        .btn-primary:disabled {
+            background-color: #a5b4fc; /* Indigo 300 */
+            cursor: not-allowed;
+        }
+        .file-input-label {
+            display: block;
+            cursor: pointer;
+            background-color: #e0e7ff; /* Indigo 100 */
+            color: #4f46e5; /* Indigo 600 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s ease-in-out;
+            border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+        }
+        .file-input-label:hover {
+            background-color: #c7d2fe; /* Indigo 200 */
+        }
+        input[type="file"] {
+            display: none; /* Hide default file input */
+        }
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e7ff; /* Light indigo */
+            border-radius: 0.5rem;
+            height: 0.75rem;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4f46e5; /* Indigo 600 */
+            border-radius: 0.5rem;
+            transition: width 0.1s ease-out; /* Smooth transition for progress */
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <header class="w-full bg-indigo-700 text-white py-4 px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Extractor de Audio de Video</h1>
+            <span class="text-lg font-semibold">Markmage</span>
+        </div>
+    </header>
+
+    <div class="card mx-auto text-center">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-6">
+            Extractor de Audio de Video
+        </h1>
+        <p class="text-gray-600 mb-8">
+            Selecciona un archivo de video para extraer su pista de audio.
+        </p>
+
+        <div class="mb-8">
+            <input type="file" id="videoFileInput" accept="video/*" />
+            <label for="videoFileInput" class="file-input-label">
+                <span id="fileNameDisplay">Seleccionar Video</span>
+            </label>
+        </div>
+
+        <button id="extractAudioBtn" class="btn-primary mb-8" disabled>
+            Extraer Audio
+        </button>
+
+        <div id="progressBarContainer" class="progress-container hidden">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div id="statusMessage" class="text-sm text-gray-700 mb-6">
+            </div>
+
+        <div id="audioPlayerContainer" class="hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Audio Extraído</h2>
+            <audio id="audioPlayer" controls class="w-full rounded-lg shadow-inner"></audio>
+            <a id="downloadLink" class="inline-block mt-4 text-indigo-600 hover:text-indigo-800 font-medium" download="audio_extraido.wav" href="#">
+                Descargar Audio
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-8 p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
+        <h3 class="text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
+        <p class="text-purple-700">Descubre otras herramientas útiles de Markmage. ¡Visita nuestro sitio web para más!</p>
+        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">Más Información</a>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const videoFileInput = document.getElementById('videoFileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const extractAudioBtn = document.getElementById('extractAudioBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const downloadLink = document.getElementById('downloadLink');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const progressBar = document.getElementById('progressBar');
+
+        let audioContext; // Global AudioContext instance
+        let videoFile = null; // To store the selected video file
+
+        // Event listener for file input change
+        videoFileInput.addEventListener('change', (event) => {
+            videoFile = event.target.files[0];
+            if (videoFile) {
+                fileNameDisplay.textContent = videoFile.name;
+                extractAudioBtn.disabled = false;
+                statusMessage.textContent = `Archivo seleccionado: ${videoFile.name}`;
+                audioPlayerContainer.classList.add('hidden'); // Hide player if new file selected
+                audioPlayer.src = ''; // Clear previous audio
+                downloadLink.href = '#'; // Clear previous download link
+                progressBarContainer.classList.add('hidden'); // Hide progress bar
+                progressBar.style.width = '0%'; // Reset progress bar
+            } else {
+                fileNameDisplay.textContent = 'Seleccionar Video';
+                extractAudioBtn.disabled = true;
+                statusMessage.textContent = 'Ningún archivo seleccionado.';
+            }
+        });
+
+        // Event listener for the extract audio button
+        extractAudioBtn.addEventListener('click', async () => {
+            if (!videoFile) {
+                statusMessage.textContent = 'Por favor, selecciona un archivo de video primero.';
+                return;
+            }
+
+            statusMessage.textContent = 'Cargando y extrayendo audio... Esto puede tardar unos segundos.';
+            extractAudioBtn.disabled = true;
+            audioPlayerContainer.classList.add('hidden');
+            progressBarContainer.classList.remove('hidden'); // Show progress bar
+            progressBar.style.width = '0%'; // Reset progress bar
+
+            try {
+                // Initialize AudioContext if it doesn't exist
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                // Read the video file as an ArrayBuffer with progress updates
+                const arrayBuffer = await readFileAsArrayBuffer(videoFile, (progress) => {
+                    progressBar.style.width = `${progress}%`;
+                });
+
+                // Decode the audio data from the ArrayBuffer
+                // Note: decodeAudioData does not provide progress, so the bar will jump to 100% after file read.
+                statusMessage.textContent = 'Decodificando audio...';
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                // Convert AudioBuffer to WAV Blob
+                const wavBlob = audioBufferToWavBlob(audioBuffer);
+
+                // Create a URL for the Blob and set it as the audio player source
+                const audioUrl = URL.createObjectURL(wavBlob);
+                audioPlayer.src = audioUrl;
+                audioPlayerContainer.classList.remove('hidden');
+                downloadLink.href = audioUrl;
+                downloadLink.download = `${videoFile.name.split('.').slice(0, -1).join('.') || 'audio_extraido'}.wav`;
+
+                statusMessage.textContent = 'Audio extraído con éxito. Puedes reproducirlo o descargarlo.';
+                progressBar.style.width = '100%'; // Ensure it's full at the end
+            } catch (error) {
+                console.error('Error al extraer el audio:', error);
+                statusMessage.textContent = `Error al extraer el audio: ${error.message}. Asegúrate de que el archivo es un formato de video válido con una pista de audio.`;
+                audioPlayerContainer.classList.add('hidden');
+                progressBar.style.width = '0%'; // Reset progress on error
+            } finally {
+                extractAudioBtn.disabled = false;
+                // Optionally hide the progress bar after a short delay for visual completion
+                setTimeout(() => {
+                    progressBarContainer.classList.add('hidden');
+                }, 1000);
+            }
+        });
+
+        /**
+         * Reads a File object as an ArrayBuffer, providing progress updates.
+         * @param {File} file - The file to read.
+         * @param {function(number): void} onProgress - Callback for progress updates (0-100).
+         * @returns {Promise<ArrayBuffer>} A promise that resolves with the ArrayBuffer.
+         */
+        function readFileAsArrayBuffer(file, onProgress) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percentLoaded = (event.loaded / event.total) * 100;
+                        onProgress(percentLoaded);
+                    }
+                };
+
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        /**
+         * Converts an AudioBuffer to a WAV Blob.
+         * This function creates a simple WAV header and concatenates it with the audio data.
+         * @param {AudioBuffer} audioBuffer - The AudioBuffer to convert.
+         * @returns {Blob} A Blob containing the WAV audio data.
+         */
+        function audioBufferToWavBlob(audioBuffer) {
+            const numOfChan = audioBuffer.numberOfChannels;
+            const sampleRate = audioBuffer.sampleRate;
+            const format = 1; // 1 = PCM
+            const bitDepth = 16; // 16-bit PCM
+
+            let bytesPerSample = bitDepth / 8;
+            let blockAlign = numOfChan * bytesPerSample;
+
+            let sData = []; // Array to hold interleaved channel data
+
+            // Interleave channels
+            for (let i = 0; i < audioBuffer.length; i++) {
+                for (let channel = 0; channel < numOfChan; channel++) {
+                    sData.push(audioBuffer.getChannelData(channel)[i]);
+                }
+            }
+
+            let dataLength = sData.length * bytesPerSample;
+            let buffer = new ArrayBuffer(44 + dataLength);
+            let dv = new DataView(buffer);
+
+            let offset = 0;
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+            function writeUint16(view, offset, input) {
+                view.setUint16(offset, input, true); // true for little-endian
+            }
+            function writeUint32(view, offset, input) {
+                view.setUint32(offset, input, true); // true for little-endian
+            }
+
+            // RIFF chunk descriptor
+            writeString(dv, offset, 'RIFF'); offset += 4;
+            writeUint32(dv, offset, 36 + dataLength); offset += 4; // ChunkSize
+            writeString(dv, offset, 'WAVE'); offset += 4;
+
+            // FMT sub-chunk
+            writeString(dv, offset, 'fmt '); offset += 4;
+            writeUint32(dv, offset, 16); offset += 4; // Subchunk1Size (16 for PCM)
+            writeUint16(dv, offset, format); offset += 2; // AudioFormat (PCM = 1)
+            writeUint16(dv, offset, numOfChan); offset += 2; // NumChannels
+            writeUint32(dv, offset, sampleRate); offset += 4; // SampleRate
+            writeUint32(dv, offset, sampleRate * blockAlign); offset += 4; // ByteRate
+            writeUint16(dv, offset, blockAlign); offset += 2; // BlockAlign
+            writeUint16(dv, offset, bitDepth); offset += 2; // BitsPerSample
+
+            // DATA sub-chunk
+            writeString(dv, offset, 'data'); offset += 4;
+            writeUint32(dv, offset, dataLength); offset += 4; // Subchunk2Size
+
+            // Write the actual audio data
+            for (let i = 0; i < sData.length; i++, offset += bytesPerSample) {
+                let s = Math.max(-1, Math.min(1, sData[i])); // Clamp to [-1, 1]
+                s = s < 0 ? s * 0x8000 : s * 0x7FFF; // Scale to 16-bit
+                dv.setInt16(offset, s, true); // Write as 16-bit signed integer, little-endian
+            }
+
+            return new Blob([dv], { type: 'audio/wav' });
+        }
+    </script>
+
+<h3> <a href="homepage.html"></a> </h3>
+</body>
+</html>
