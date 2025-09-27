@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertir Imágenes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #add8e6; /* Light blue background */
+        }
+        /* Custom styles for better visual appeal */
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            padding: 2.5rem;
+            max-width: 3xl; /* Max width for content */
+            width: 95%; /* Responsive width */
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca; /* Indigo 700 */
+        }
+        .btn-primary:disabled {
+            background-color: #a5b4fc; /* Indigo 300 */
+            cursor: not-allowed;
+        }
+        .file-input-label {
+            display: block;
+            cursor: pointer;
+            background-color: #e0e7ff; /* Indigo 100 */
+            color: #4f46e5; /* Indigo 600 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s ease-in-out;
+            border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+        }
+        .file-input-label:hover {
+            background-color: #c7d2fe; /* Indigo 200 */
+        }
+        input[type="file"] {
+            display: none; /* Hide default file input */
+        }
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e7ff; /* Light indigo */
+            border-radius: 0.5rem;
+            height: 0.75rem;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4f46e5; /* Indigo 600 */
+            border-radius: 0.5rem;
+            transition: width 0.1s ease-out; /* Smooth transition for progress */
+        }
+        /* Navigation styles */
+        .nav-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .nav-link:hover {
+            background-color: #e0e7ff;
+        }
+        /* Image preview styles */
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <header class="w-full bg-indigo-700 text-white py-4 px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Conversor de Imágenes</h1>
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="nav-link text-white hover:bg-indigo-600">Audio Extractor</a>
+                <a href="word-to-pdf.html" class="nav-link text-white hover:bg-indigo-600">Word ↔ PDF</a>
+                <span class="text-lg font-semibold">Markmage</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="card mx-auto text-center">
+        <div class="mb-6">
+            <h1 class="text-4xl font-extrabold text-gray-800 mb-4">
+                <span id="mainTitle">Convertir JPG a PNG</span>
+            </h1>
+            <div class="flex items-center justify-center space-x-4 mb-4">
+                <span id="fromLabel" class="text-sm font-medium text-gray-600">JPG</span>
+                <button id="swapBtn" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 p-2 rounded-full transition duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                </button>
+                <span id="toLabel" class="text-sm font-medium text-gray-600">PNG</span>
+            </div>
+        </div>
+        <p class="text-gray-600 mb-8">
+            <span id="descriptionText">Selecciona una imagen JPG para convertirla a PNG.</span>
+        </p>
+
+        <div class="mb-8">
+            <input type="file" id="imageInput" accept=".jpg,.jpeg,.png" />
+            <label for="imageInput" class="file-input-label">
+                <span id="fileNameDisplay">Seleccionar Imagen JPG</span>
+            </label>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Opciones de conversión:</label>
+            <div id="conversionOptions" class="flex flex-col sm:flex-row gap-4 justify-center">
+                <label class="flex items-center">
+                    <input type="checkbox" id="preserveQuality" checked class="mr-2">
+                    <span class="text-sm text-gray-600">Preservar calidad</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="optimizeSize" class="mr-2">
+                    <span class="text-sm text-gray-600">Optimizar tamaño</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="removeBackground" class="mr-2">
+                    <span class="text-sm text-gray-600">Remover fondo (PNG)</span>
+                </label>
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn-primary mb-8" disabled>
+            <span id="convertBtnText">Convertir a PNG</span>
+        </button>
+
+        <div id="progressBarContainer" class="progress-container hidden">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div id="statusMessage" class="text-sm text-gray-700 mb-6">
+        </div>
+
+        <!-- Image Preview Section -->
+        <div id="imagePreviewContainer" class="hidden mb-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Vista Previa</h3>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-2">Original</p>
+                    <img id="originalImage" class="image-preview" alt="Imagen original">
+                </div>
+                <div class="text-2xl text-gray-400">→</div>
+                <div class="text-center">
+                    <p class="text-sm text-gray-600 mb-2">Convertida</p>
+                    <img id="convertedImage" class="image-preview" alt="Imagen convertida">
+                </div>
+            </div>
+        </div>
+
+        <div id="downloadContainer" class="hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+                <span id="downloadTitle">PNG Generado</span>
+            </h2>
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <p class="text-sm text-gray-600 mb-2">
+                    <span id="downloadDescription">Tu imagen PNG está listo para descargar</span>
+                </p>
+                <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition duration-200 font-medium" download="imagen.png" href="#">
+                    <span id="downloadButtonText">🖼️ Descargar PNG</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
+        <h3 class="text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
+        <p class="text-purple-700">Descubre otras herramientas útiles de Markmage. ¡Visita nuestro sitio web para más!</p>
+        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">Más Información</a>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const imageInput = document.getElementById('imageInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const convertBtn = document.getElementById('convertBtn');
+        const convertBtnText = document.getElementById('convertBtnText');
+        const statusMessage = document.getElementById('statusMessage');
+        const downloadContainer = document.getElementById('downloadContainer');
+        const downloadLink = document.getElementById('downloadLink');
+        const downloadTitle = document.getElementById('downloadTitle');
+        const downloadDescription = document.getElementById('downloadDescription');
+        const downloadButtonText = document.getElementById('downloadButtonText');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const progressBar = document.getElementById('progressBar');
+        const mainTitle = document.getElementById('mainTitle');
+        const descriptionText = document.getElementById('descriptionText');
+        const fromLabel = document.getElementById('fromLabel');
+        const toLabel = document.getElementById('toLabel');
+        const swapBtn = document.getElementById('swapBtn');
+        const conversionOptions = document.getElementById('conversionOptions');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const originalImage = document.getElementById('originalImage');
+        const convertedImage = document.getElementById('convertedImage');
+
+        let selectedFile = null; // To store the selected image file
+        let isJpgToPng = true; // Current conversion direction
+
+        // Swap button functionality
+        swapBtn.addEventListener('click', () => {
+            isJpgToPng = !isJpgToPng;
+            updateUI();
+            resetForm();
+        });
+
+        // Update UI based on conversion direction
+        function updateUI() {
+            if (isJpgToPng) {
+                mainTitle.textContent = 'Convertir JPG a PNG';
+                descriptionText.textContent = 'Selecciona una imagen JPG para convertirla a PNG.';
+                fromLabel.textContent = 'JPG';
+                toLabel.textContent = 'PNG';
+                convertBtnText.textContent = 'Convertir a PNG';
+                fileNameDisplay.textContent = 'Seleccionar Imagen JPG';
+                imageInput.accept = '.jpg,.jpeg';
+                downloadTitle.textContent = 'PNG Generado';
+                downloadDescription.textContent = 'Tu imagen PNG está listo para descargar';
+                downloadButtonText.textContent = '🖼️ Descargar PNG';
+                conversionOptions.style.display = 'flex';
+            } else {
+                mainTitle.textContent = 'Convertir PNG a JPG';
+                descriptionText.textContent = 'Selecciona una imagen PNG para convertirla a JPG.';
+                fromLabel.textContent = 'PNG';
+                toLabel.textContent = 'JPG';
+                convertBtnText.textContent = 'Convertir a JPG';
+                fileNameDisplay.textContent = 'Seleccionar Imagen PNG';
+                imageInput.accept = '.png';
+                downloadTitle.textContent = 'JPG Generado';
+                downloadDescription.textContent = 'Tu imagen JPG está listo para descargar';
+                downloadButtonText.textContent = '🖼️ Descargar JPG';
+                conversionOptions.style.display = 'flex';
+            }
+        }
+
+        // Reset form when swapping
+        function resetForm() {
+            selectedFile = null;
+            imageInput.value = '';
+            convertBtn.disabled = true;
+            downloadContainer.classList.add('hidden');
+            imagePreviewContainer.classList.add('hidden');
+            progressBarContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            statusMessage.textContent = 'Ninguna imagen seleccionada.';
+            originalImage.src = '';
+            convertedImage.src = '';
+        }
+
+        // Event listener for image input change
+        imageInput.addEventListener('change', (event) => {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                fileNameDisplay.textContent = selectedFile.name;
+                convertBtn.disabled = false;
+                statusMessage.textContent = `Imagen seleccionada: ${selectedFile.name}`;
+                
+                // Show original image preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    originalImage.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(selectedFile);
+                
+                downloadContainer.classList.add('hidden');
+                downloadLink.href = '#';
+                progressBarContainer.classList.add('hidden');
+                progressBar.style.width = '0%';
+                convertedImage.src = '';
+            } else {
+                fileNameDisplay.textContent = isJpgToPng ? 'Seleccionar Imagen JPG' : 'Seleccionar Imagen PNG';
+                convertBtn.disabled = true;
+                statusMessage.textContent = 'Ninguna imagen seleccionada.';
+                imagePreviewContainer.classList.add('hidden');
+            }
+        });
+
+        // Event listener for the convert button
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                const fileType = isJpgToPng ? 'JPG' : 'PNG';
+                statusMessage.textContent = `Por favor, selecciona una imagen ${fileType} primero.`;
+                return;
+            }
+
+            const fileType = isJpgToPng ? 'JPG' : 'PNG';
+            statusMessage.textContent = `Procesando imagen ${fileType}... Esto puede tardar unos segundos.`;
+            convertBtn.disabled = true;
+            downloadContainer.classList.add('hidden');
+            progressBarContainer.classList.remove('hidden');
+            progressBar.style.width = '0%';
+
+            try {
+                // Simulate conversion process with progress updates
+                await simulateConversion();
+
+                // Get conversion options
+                const preserveQuality = document.getElementById('preserveQuality').checked;
+                const optimizeSize = document.getElementById('optimizeSize').checked;
+                const removeBackground = document.getElementById('removeBackground').checked;
+
+                // Create converted image blob
+                const convertedBlob = await convertImage(selectedFile, {
+                    preserveQuality,
+                    optimizeSize,
+                    removeBackground
+                });
+
+                // Show converted image preview
+                const convertedUrl = URL.createObjectURL(convertedBlob);
+                convertedImage.src = convertedUrl;
+
+                // Set up download
+                downloadLink.href = convertedUrl;
+                const fileExtension = isJpgToPng ? 'png' : 'jpg';
+                downloadLink.download = `${selectedFile.name.split('.').slice(0, -1).join('.') || 'imagen'}.${fileExtension}`;
+                downloadContainer.classList.remove('hidden');
+
+                statusMessage.textContent = `Conversión completada exitosamente. Puedes descargar tu ${fileExtension.toUpperCase()}.`;
+                progressBar.style.width = '100%';
+            } catch (error) {
+                console.error('Error al convertir la imagen:', error);
+                const fileType = isJpgToPng ? 'JPG' : 'PNG';
+                statusMessage.textContent = `Error al convertir la imagen: ${error.message}. Asegúrate de que el archivo es un formato ${fileType} válido.`;
+                downloadContainer.classList.add('hidden');
+                progressBar.style.width = '0%';
+            } finally {
+                convertBtn.disabled = false;
+                setTimeout(() => {
+                    progressBarContainer.classList.add('hidden');
+                }, 1000);
+            }
+        });
+
+        /**
+         * Simulates the conversion process with progress updates
+         */
+        async function simulateConversion() {
+            const steps = [
+                { progress: 20, message: 'Cargando imagen...' },
+                { progress: 40, message: 'Analizando formato...' },
+                { progress: 60, message: 'Aplicando conversión...' },
+                { progress: 80, message: 'Optimizando resultado...' },
+                { progress: 100, message: 'Finalizando conversión...' }
+            ];
+
+            for (const step of steps) {
+                await new Promise(resolve => setTimeout(resolve, 600));
+                progressBar.style.width = `${step.progress}%`;
+                statusMessage.textContent = step.message;
+            }
+        }
+
+        /**
+         * Converts image from one format to another
+         * @param {File} file - The image file to convert
+         * @param {Object} options - Conversion options
+         * @returns {Promise<Blob>} The converted image blob
+         */
+        async function convertImage(file, options) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+
+                img.onload = () => {
+                    // Set canvas dimensions
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    // Draw image on canvas
+                    ctx.drawImage(img, 0, 0);
+
+                    // Convert to desired format
+                    const outputFormat = isJpgToPng ? 'image/png' : 'image/jpeg';
+                    const quality = options.preserveQuality ? 0.95 : 0.8;
+
+                    canvas.toBlob((blob) => {
+                        if (blob) {
+                            resolve(blob);
+                        } else {
+                            reject(new Error('Error al convertir la imagen'));
+                        }
+                    }, outputFormat, quality);
+                };
+
+                img.onerror = () => reject(new Error('Error al cargar la imagen'));
+                
+                // Load the image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject(new Error('Error al leer el archivo'));
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>
