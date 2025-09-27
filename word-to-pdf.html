@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertir Word a PDF</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #add8e6; /* Light blue background */
+        }
+        /* Custom styles for better visual appeal */
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            padding: 2.5rem;
+            max-width: 3xl; /* Max width for content */
+            width: 95%; /* Responsive width */
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca; /* Indigo 700 */
+        }
+        .btn-primary:disabled {
+            background-color: #a5b4fc; /* Indigo 300 */
+            cursor: not-allowed;
+        }
+        .file-input-label {
+            display: block;
+            cursor: pointer;
+            background-color: #e0e7ff; /* Indigo 100 */
+            color: #4f46e5; /* Indigo 600 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s ease-in-out;
+            border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+        }
+        .file-input-label:hover {
+            background-color: #c7d2fe; /* Indigo 200 */
+        }
+        input[type="file"] {
+            display: none; /* Hide default file input */
+        }
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e7ff; /* Light indigo */
+            border-radius: 0.5rem;
+            height: 0.75rem;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4f46e5; /* Indigo 600 */
+            border-radius: 0.5rem;
+            transition: width 0.1s ease-out; /* Smooth transition for progress */
+        }
+        /* Navigation styles */
+        .nav-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .nav-link:hover {
+            background-color: #e0e7ff;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <header class="w-full bg-indigo-700 text-white py-4 px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Conversor Word ↔ PDF</h1>
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="nav-link text-white hover:bg-indigo-600">Audio Extractor</a>
+                <span class="text-lg font-semibold">Markmage</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="card mx-auto text-center">
+        <div class="mb-6">
+            <h1 class="text-4xl font-extrabold text-gray-800 mb-4">
+                <span id="mainTitle">Convertir Word a PDF</span>
+            </h1>
+            <div class="flex items-center justify-center space-x-4 mb-4">
+                <span id="fromLabel" class="text-sm font-medium text-gray-600">Word</span>
+                <button id="swapBtn" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 p-2 rounded-full transition duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                </button>
+                <span id="toLabel" class="text-sm font-medium text-gray-600">PDF</span>
+            </div>
+        </div>
+        <p class="text-gray-600 mb-8">
+            <span id="descriptionText">Selecciona un archivo de Word (.docx) para convertirlo a PDF.</span>
+        </p>
+
+        <div class="mb-8">
+            <input type="file" id="fileInput" accept=".docx,.doc,.pdf" />
+            <label for="fileInput" class="file-input-label">
+                <span id="fileNameDisplay">Seleccionar Archivo Word</span>
+            </label>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Opciones de conversión:</label>
+            <div id="conversionOptions" class="flex flex-col sm:flex-row gap-4 justify-center">
+                <label class="flex items-center">
+                    <input type="checkbox" id="preserveFormatting" checked class="mr-2">
+                    <span class="text-sm text-gray-600">Preservar formato</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="includeImages" checked class="mr-2">
+                    <span class="text-sm text-gray-600">Incluir imágenes</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="compressOutput" class="mr-2">
+                    <span class="text-sm text-gray-600">Comprimir PDF</span>
+                </label>
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn-primary mb-8" disabled>
+            <span id="convertBtnText">Convertir a PDF</span>
+        </button>
+
+        <div id="progressBarContainer" class="progress-container hidden">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div id="statusMessage" class="text-sm text-gray-700 mb-6">
+        </div>
+
+        <div id="downloadContainer" class="hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+                <span id="downloadTitle">PDF Generado</span>
+            </h2>
+            <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                <p class="text-sm text-gray-600 mb-2">
+                    <span id="downloadDescription">Tu archivo PDF está listo para descargar</span>
+                </p>
+                <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition duration-200 font-medium" download="documento.pdf" href="#">
+                    <span id="downloadButtonText">📄 Descargar PDF</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8 p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
+        <h3 class="text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
+        <p class="text-purple-700">Descubre otras herramientas útiles de Markmage. ¡Visita nuestro sitio web para más!</p>
+        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">Más Información</a>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const convertBtn = document.getElementById('convertBtn');
+        const convertBtnText = document.getElementById('convertBtnText');
+        const statusMessage = document.getElementById('statusMessage');
+        const downloadContainer = document.getElementById('downloadContainer');
+        const downloadLink = document.getElementById('downloadLink');
+        const downloadTitle = document.getElementById('downloadTitle');
+        const downloadDescription = document.getElementById('downloadDescription');
+        const downloadButtonText = document.getElementById('downloadButtonText');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const progressBar = document.getElementById('progressBar');
+        const mainTitle = document.getElementById('mainTitle');
+        const descriptionText = document.getElementById('descriptionText');
+        const fromLabel = document.getElementById('fromLabel');
+        const toLabel = document.getElementById('toLabel');
+        const swapBtn = document.getElementById('swapBtn');
+        const conversionOptions = document.getElementById('conversionOptions');
+
+        let selectedFile = null; // To store the selected file
+        let isWordToPdf = true; // Current conversion direction
+
+        // Swap button functionality
+        swapBtn.addEventListener('click', () => {
+            isWordToPdf = !isWordToPdf;
+            updateUI();
+            resetForm();
+        });
+
+        // Update UI based on conversion direction
+        function updateUI() {
+            if (isWordToPdf) {
+                mainTitle.textContent = 'Convertir Word a PDF';
+                descriptionText.textContent = 'Selecciona un archivo de Word (.docx) para convertirlo a PDF.';
+                fromLabel.textContent = 'Word';
+                toLabel.textContent = 'PDF';
+                convertBtnText.textContent = 'Convertir a PDF';
+                fileNameDisplay.textContent = 'Seleccionar Archivo Word';
+                fileInput.accept = '.docx,.doc';
+                downloadTitle.textContent = 'PDF Generado';
+                downloadDescription.textContent = 'Tu archivo PDF está listo para descargar';
+                downloadButtonText.textContent = '📄 Descargar PDF';
+                conversionOptions.style.display = 'flex';
+            } else {
+                mainTitle.textContent = 'Convertir PDF a Word';
+                descriptionText.textContent = 'Selecciona un archivo PDF para convertirlo a Word.';
+                fromLabel.textContent = 'PDF';
+                toLabel.textContent = 'Word';
+                convertBtnText.textContent = 'Convertir a Word';
+                fileNameDisplay.textContent = 'Seleccionar Archivo PDF';
+                fileInput.accept = '.pdf';
+                downloadTitle.textContent = 'Word Generado';
+                downloadDescription.textContent = 'Tu archivo Word está listo para descargar';
+                downloadButtonText.textContent = '📝 Descargar Word';
+                conversionOptions.style.display = 'none';
+            }
+        }
+
+        // Reset form when swapping
+        function resetForm() {
+            selectedFile = null;
+            fileInput.value = '';
+            convertBtn.disabled = true;
+            downloadContainer.classList.add('hidden');
+            progressBarContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+            statusMessage.textContent = 'Ningún archivo seleccionado.';
+        }
+
+        // Event listener for file input change
+        fileInput.addEventListener('change', (event) => {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                fileNameDisplay.textContent = selectedFile.name;
+                convertBtn.disabled = false;
+                statusMessage.textContent = `Archivo seleccionado: ${selectedFile.name}`;
+                downloadContainer.classList.add('hidden'); // Hide download if new file selected
+                downloadLink.href = '#'; // Clear previous download link
+                progressBarContainer.classList.add('hidden'); // Hide progress bar
+                progressBar.style.width = '0%'; // Reset progress bar
+            } else {
+                fileNameDisplay.textContent = isWordToPdf ? 'Seleccionar Archivo Word' : 'Seleccionar Archivo PDF';
+                convertBtn.disabled = true;
+                statusMessage.textContent = 'Ningún archivo seleccionado.';
+            }
+        });
+
+        // Event listener for the convert button
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                const fileType = isWordToPdf ? 'Word' : 'PDF';
+                statusMessage.textContent = `Por favor, selecciona un archivo ${fileType} primero.`;
+                return;
+            }
+
+            const fileType = isWordToPdf ? 'Word' : 'PDF';
+            statusMessage.textContent = `Procesando archivo ${fileType}... Esto puede tardar unos segundos.`;
+            convertBtn.disabled = true;
+            downloadContainer.classList.add('hidden');
+            progressBarContainer.classList.remove('hidden'); // Show progress bar
+            progressBar.style.width = '0%'; // Reset progress bar
+
+            try {
+                // Simulate conversion process with progress updates
+                await simulateConversion();
+
+                let outputBlob;
+                let fileExtension;
+
+                if (isWordToPdf) {
+                    // Get conversion options for Word to PDF
+                    const preserveFormatting = document.getElementById('preserveFormatting').checked;
+                    const includeImages = document.getElementById('includeImages').checked;
+                    const compressOutput = document.getElementById('compressOutput').checked;
+
+                    // Create a mock PDF blob
+                    outputBlob = await createMockPDF(selectedFile, {
+                        preserveFormatting,
+                        includeImages,
+                        compressOutput
+                    });
+                    fileExtension = 'pdf';
+                } else {
+                    // Create a mock Word blob for PDF to Word
+                    outputBlob = await createMockWord(selectedFile);
+                    fileExtension = 'docx';
+                }
+
+                // Create a URL for the Blob and set it as the download link
+                const outputUrl = URL.createObjectURL(outputBlob);
+                downloadLink.href = outputUrl;
+                downloadLink.download = `${selectedFile.name.split('.').slice(0, -1).join('.') || 'documento'}.${fileExtension}`;
+                downloadContainer.classList.remove('hidden');
+
+                statusMessage.textContent = `Conversión completada exitosamente. Puedes descargar tu ${fileExtension.toUpperCase()}.`;
+                progressBar.style.width = '100%'; // Ensure it's full at the end
+            } catch (error) {
+                console.error('Error al convertir el archivo:', error);
+                const fileType = isWordToPdf ? 'Word' : 'PDF';
+                statusMessage.textContent = `Error al convertir el archivo: ${error.message}. Asegúrate de que el archivo es un formato ${fileType} válido.`;
+                downloadContainer.classList.add('hidden');
+                progressBar.style.width = '0%'; // Reset progress on error
+            } finally {
+                convertBtn.disabled = false;
+                // Optionally hide the progress bar after a short delay for visual completion
+                setTimeout(() => {
+                    progressBarContainer.classList.add('hidden');
+                }, 1000);
+            }
+        });
+
+        /**
+         * Simulates the conversion process with progress updates
+         */
+        async function simulateConversion() {
+            const steps = [
+                { progress: 20, message: 'Leyendo archivo Word...' },
+                { progress: 40, message: 'Analizando contenido...' },
+                { progress: 60, message: 'Aplicando formato...' },
+                { progress: 80, message: 'Generando PDF...' },
+                { progress: 100, message: 'Finalizando conversión...' }
+            ];
+
+            for (const step of steps) {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                progressBar.style.width = `${step.progress}%`;
+                statusMessage.textContent = step.message;
+            }
+        }
+
+        /**
+         * Creates a mock PDF blob for demonstration purposes
+         * In a real implementation, this would use a library like jsPDF or PDF-lib
+         */
+        async function createMockPDF(file, options) {
+            // This is a mock implementation - in reality you would use a proper PDF library
+            const mockPDFContent = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(Converted from: ${file.name}) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000204 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+297
+%%EOF`;
+
+            return new Blob([mockPDFContent], { type: 'application/pdf' });
+        }
+
+        /**
+         * Creates a mock Word blob for demonstration purposes
+         * In a real implementation, this would use a library like docx or PizZip
+         */
+        async function createMockWord(file) {
+            // This is a mock implementation - in reality you would use a proper Word library
+            const mockWordContent = `PK\x03\x04\x14\x00\x00\x00\x08\x00\x00\x00!\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x13\x00\x00\x00[Content_Types].xml\x00\x00\x00Converted from: ${file.name}`;
+            
+            return new Blob([mockWordContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        }
+    </script>
+</body>
+</html>
