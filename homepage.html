@@ -1,11 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>videotoaudiomp3.space - Herramientas de Conversión Gratuitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #add8e6; /* Light blue background */
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        .header-brand {
+            font-family: 'Crimson Text', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            max-width: 3xl;
+            width: 95%;
+        }
+        
+        @media (min-width: 640px) {
+            .card {
+                padding: 2.5rem;
+            }
+        }
+        .tool-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+            border-color: #4f46e5;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .feature-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
 </head>
-<body>
-    <h1> MARKMAGE WEB</h1>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="w-full bg-indigo-700 text-white py-4 px-4 sm:px-6 mb-8 shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="header-title text-xl sm:text-2xl lg:text-3xl font-bold text-center sm:text-left">videotoaudiomp3.space</h1>
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+                    <a href="index.html" class="text-white hover:bg-indigo-600 px-2 sm:px-3 py-1 rounded transition duration-200 text-sm sm:text-base">Audio Extractor</a>
+                    <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-2 sm:px-3 py-1 rounded transition duration-200 text-sm sm:text-base">Word ↔ PDF</a>
+                    <a href="image-converter.html" class="text-white hover:bg-indigo-600 px-2 sm:px-3 py-1 rounded transition duration-200 text-sm sm:text-base">Imágenes</a>
+                    <a href="pdf-editor.html" class="text-white hover:bg-indigo-600 px-2 sm:px-3 py-1 rounded transition duration-200 text-sm sm:text-base">Editor PDF</a>
+                    <a href="pdf-to-audio.html" class="text-white hover:bg-indigo-600 px-2 sm:px-3 py-1 rounded transition duration-200 text-sm sm:text-base">PDF a Audio</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <!-- Hero Section -->
+        <div class="card mx-auto text-center mb-8">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-gray-800 mb-4 sm:mb-6">
+                Herramientas de Conversión Gratuitas
+            </h1>
+            <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg px-2">
+                Convierte, edita y transforma tus archivos de manera fácil y segura. 
+                Todo desde tu navegador, sin necesidad de descargar software.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="index.html" class="btn-primary text-sm sm:text-base">Comenzar Ahora</a>
+                <a href="#tools" class="btn-primary bg-gray-600 hover:bg-gray-700 text-sm sm:text-base">Ver Herramientas</a>
+            </div>
+        </div>
+
+        <!-- Tools Grid -->
+        <div id="tools" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+            <!-- Audio Extractor -->
+            <div class="tool-card text-center">
+                <div class="feature-icon">🎵</div>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">Extractor de Audio</h3>
+                <p class="text-gray-600 text-sm sm:text-base mb-4">Extrae audio de videos en formato WAV de alta calidad</p>
+                <a href="index.html" class="btn-primary text-sm">Usar Herramienta</a>
+            </div>
+
+            <!-- Word to PDF -->
+            <div class="tool-card text-center">
+                <div class="feature-icon">📄</div>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">Word ↔ PDF</h3>
+                <p class="text-gray-600 text-sm sm:text-base mb-4">Convierte documentos Word a PDF y viceversa</p>
+                <a href="word-to-pdf.html" class="btn-primary text-sm">Usar Herramienta</a>
+            </div>
+
+            <!-- Image Converter -->
+            <div class="tool-card text-center">
+                <div class="feature-icon">🖼️</div>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">Conversor de Imágenes</h3>
+                <p class="text-gray-600 text-sm sm:text-base mb-4">Convierte entre JPG y PNG con opciones de calidad</p>
+                <a href="image-converter.html" class="btn-primary text-sm">Usar Herramienta</a>
+            </div>
+
+            <!-- PDF Editor -->
+            <div class="tool-card text-center">
+                <div class="feature-icon">✏️</div>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">Editor de PDF</h3>
+                <p class="text-gray-600 text-sm sm:text-base mb-4">Edita, anota y modifica archivos PDF</p>
+                <a href="pdf-editor.html" class="btn-primary text-sm">Usar Herramienta</a>
+            </div>
+
+            <!-- PDF to Audio -->
+            <div class="tool-card text-center">
+                <div class="feature-icon">🎧</div>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">PDF a Audio</h3>
+                <p class="text-gray-600 text-sm sm:text-base mb-4">Convierte PDFs a audio MP3 con voces personalizables</p>
+                <a href="pdf-to-audio.html" class="btn-primary text-sm">Usar Herramienta</a>
+            </div>
+
+            <!-- Coming Soon -->
+            <div class="tool-card text-center opacity-75">
+                <div class="feature-icon">🚀</div>
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">Más Herramientas</h3>
+                <p class="text-gray-600 text-sm sm:text-base mb-4">Nuevas herramientas en desarrollo</p>
+                <button class="btn-primary bg-gray-400 cursor-not-allowed text-sm" disabled>Próximamente</button>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="card mx-auto mb-8">
+            <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-6 text-center">¿Por qué elegir videotoaudiomp3.space?</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl mb-3">🔒</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">100% Seguro</h3>
+                    <p class="text-gray-600 text-sm sm:text-base">Tus archivos se procesan localmente y nunca se almacenan en nuestros servidores</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl mb-3">⚡</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Rápido y Eficiente</h3>
+                    <p class="text-gray-600 text-sm sm:text-base">Conversiones instantáneas sin esperas ni limitaciones de tiempo</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl sm:text-4xl mb-3">💯</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Completamente Gratis</h3>
+                    <p class="text-gray-600 text-sm sm:text-base">Sin costos ocultos, sin registro requerido, sin límites de uso</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="card mx-auto text-center bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-4">¿Listo para comenzar?</h2>
+            <p class="text-indigo-100 mb-6 text-sm sm:text-base">Elige una herramienta y comienza a convertir tus archivos en segundos</p>
+            <a href="index.html" class="bg-white text-indigo-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-semibold transition duration-200 text-sm sm:text-base">Comenzar Ahora</a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full bg-indigo-900 text-white py-6 px-4 mt-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="flex flex-wrap justify-center gap-4 mb-4">
+                <a href="index.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">Inicio</a>
+                <a href="word-to-pdf.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">Word ↔ PDF</a>
+                <a href="image-converter.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">Imágenes</a>
+                <a href="pdf-editor.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">Editor PDF</a>
+                <a href="pdf-to-audio.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">PDF a Audio</a>
+                <a href="terms-of-use.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">Términos</a>
+                <a href="faq.html" class="text-indigo-200 hover:text-white transition duration-200 text-sm sm:text-base">FAQ</a>
+            </div>
+            <p class="text-sm text-indigo-300">
+                © 2024 videotoaudiomp3.space. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
 </body>
 </html>

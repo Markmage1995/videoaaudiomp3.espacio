@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF a Audio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #add8e6; /* Light blue background */
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        .header-brand {
+            font-family: 'Crimson Text', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        /* Custom styles for better visual appeal */
+        .card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+            padding: 1.5rem;
+            max-width: 3xl; /* Max width for content */
+            width: 95%; /* Responsive width */
+        }
+        
+        @media (min-width: 640px) {
+            .card {
+                padding: 2.5rem;
+            }
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca; /* Indigo 700 */
+        }
+        .btn-primary:disabled {
+            background-color: #a5b4fc; /* Indigo 300 */
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Gray 500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Gray 600 */
+        }
+        .file-input-label {
+            display: block;
+            cursor: pointer;
+            background-color: #e0e7ff; /* Indigo 100 */
+            color: #4f46e5; /* Indigo 600 */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s ease-in-out;
+            border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+            word-wrap: break-word;
+        }
+        
+        @media (min-width: 640px) {
+            .file-input-label {
+                padding: 0.75rem 1.5rem;
+            }
+        }
+        .file-input-label:hover {
+            background-color: #c7d2fe; /* Indigo 200 */
+        }
+        input[type="file"] {
+            display: none; /* Hide default file input */
+        }
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e7ff; /* Light indigo */
+            border-radius: 0.5rem;
+            height: 0.75rem;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4f46e5; /* Indigo 600 */
+            border-radius: 0.5rem;
+            transition: width 0.1s ease-out; /* Smooth transition for progress */
+        }
+        /* Audio controls styles */
+        .audio-controls {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .voice-selector {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            width: 100%;
+        }
+        .voice-selector:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        .range-slider {
+            width: 100%;
+            height: 0.5rem;
+            border-radius: 0.25rem;
+            background: #e0e7ff;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+        }
+        .range-slider::-moz-range-thumb {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            border: none;
+        }
+        .text-preview {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            text-align: left;
+        }
+        .text-preview::-webkit-scrollbar {
+            width: 6px;
+        }
+        .text-preview::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        .text-preview::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .text-preview::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+    <header class="w-full bg-indigo-700 text-white py-4 px-4 sm:px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="header-title text-lg sm:text-xl lg:text-2xl font-bold text-center sm:text-left">PDF a Audio</h1>
+                <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 lg:gap-4">
+                    <a href="homepage.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Inicio</a>
+                    <a href="index.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Audio Extractor</a>
+                    <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Word ↔ PDF</a>
+                    <a href="pdf-editor.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Editor PDF</a>
+                    <a href="image-converter.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Imágenes</a>
+                    <span class="header-brand text-xs sm:text-sm lg:text-base font-semibold hidden sm:inline">videotoaudiomp3.space</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="card mx-auto text-center">
+        <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-gray-800 mb-4 sm:mb-6">
+            Convertir PDF a Audio
+        </h1>
+        <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base px-2">
+            Sube un archivo PDF y conviértelo en audio usando tecnología de texto a voz.
+        </p>
+
+        <!-- File Upload Section -->
+        <div class="mb-6 sm:mb-8">
+            <input type="file" id="pdfFileInput" accept=".pdf" />
+            <label for="pdfFileInput" class="file-input-label text-xs sm:text-sm lg:text-base">
+                <span id="fileNameDisplay">📄 Seleccionar Archivo PDF</span>
+            </label>
+        </div>
+
+        <!-- Voice Settings -->
+        <div id="voiceSettings" class="audio-controls hidden">
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 mb-4">Configuración de Voz</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Voz</label>
+                    <select id="voiceSelect" class="voice-selector text-xs sm:text-sm">
+                        <option value="">Voz por defecto</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Velocidad</label>
+                    <input type="range" id="rateSlider" class="range-slider" min="0.5" max="2" step="0.1" value="1">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Lenta</span>
+                        <span id="rateValue">1.0x</span>
+                        <span>Rápida</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Volumen</label>
+                    <input type="range" id="volumeSlider" class="range-slider" min="0" max="1" step="0.1" value="1">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Bajo</span>
+                        <span id="volumeValue">100%</span>
+                        <span>Alto</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Tono</label>
+                    <input type="range" id="pitchSlider" class="range-slider" min="0" max="2" step="0.1" value="1">
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>Bajo</span>
+                        <span id="pitchValue">1.0</span>
+                        <span>Alto</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Preview -->
+        <div id="textPreviewContainer" class="hidden mb-6">
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 mb-2">Vista Previa del Texto</h3>
+            <div class="text-preview" id="textPreview">
+                <!-- Text content will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div id="controlButtons" class="hidden mb-6">
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 justify-center">
+                <button id="playBtn" class="btn-primary text-xs sm:text-sm">
+                    ▶️ Reproducir
+                </button>
+                <button id="pauseBtn" class="btn-secondary text-xs sm:text-sm" disabled>
+                    ⏸️ Pausar
+                </button>
+                <button id="stopBtn" class="btn-secondary text-xs sm:text-sm" disabled>
+                    ⏹️ Detener
+                </button>
+                <button id="downloadBtn" class="btn-primary text-xs sm:text-sm" disabled>
+                    💾 Descargar MP3
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progressBarContainer" class="progress-container hidden">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusMessage" class="text-sm text-gray-700 mb-6">
+        </div>
+
+        <!-- Audio Player -->
+        <div id="audioPlayerContainer" class="hidden">
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Reproductor de Audio</h2>
+            <audio id="audioPlayer" controls class="w-full rounded-lg shadow-inner mb-4"></audio>
+            <div class="text-xs sm:text-sm text-gray-600">
+                <p>Duración: <span id="audioDuration">--:--</span></p>
+                <p>Tamaño: <span id="audioSize">--</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
+        <h3 class="text-lg sm:text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
+        <p class="text-purple-700 text-sm sm:text-base">Descubre otras herramientas útiles de videotoaudiomp3.space. ¡Visita nuestro sitio web para más!</p>
+        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200 text-sm sm:text-base">Más Información</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full bg-indigo-900 text-white py-6 px-4 mt-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4">
+                <a href="homepage.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Inicio</a>
+                <a href="index.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Audio Extractor</a>
+                <a href="word-to-pdf.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Word ↔ PDF</a>
+                <a href="image-converter.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Imágenes</a>
+                <a href="pdf-editor.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Editor PDF</a>
+                <a href="pdf-to-audio.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">PDF a Audio</a>
+                <a href="terms-of-use.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Términos</a>
+                <a href="faq.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">FAQ</a>
+            </div>
+            <p class="text-xs sm:text-sm text-indigo-300">
+                © 2024 videotoaudiomp3.space. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Get references to HTML elements
+        const pdfFileInput = document.getElementById('pdfFileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const statusMessage = document.getElementById('statusMessage');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const progressBar = document.getElementById('progressBar');
+        const voiceSettings = document.getElementById('voiceSettings');
+        const textPreviewContainer = document.getElementById('textPreviewContainer');
+        const textPreview = document.getElementById('textPreview');
+        const controlButtons = document.getElementById('controlButtons');
+        const audioPlayerContainer = document.getElementById('audioPlayerContainer');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const rateSlider = document.getElementById('rateSlider');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const pitchSlider = document.getElementById('pitchSlider');
+        const rateValue = document.getElementById('rateValue');
+        const volumeValue = document.getElementById('volumeValue');
+        const pitchValue = document.getElementById('pitchValue');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const audioDuration = document.getElementById('audioDuration');
+        const audioSize = document.getElementById('audioSize');
+
+        let selectedFile = null;
+        let pdfDoc = null;
+        let extractedText = '';
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let audioBlob = null;
+        let audioChunks = [];
+        let mediaRecorder = null;
+        let audioContext = null;
+        let isRecording = false;
+
+        // Load available voices
+        function loadVoices() {
+            const voices = speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '<option value="">Voz por defecto</option>';
+            
+            voices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        // Load voices when they become available
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+        loadVoices();
+
+        // Update slider value displays
+        rateSlider.addEventListener('input', (e) => {
+            rateValue.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+        });
+
+        volumeSlider.addEventListener('input', (e) => {
+            volumeValue.textContent = Math.round(parseFloat(e.target.value) * 100) + '%';
+        });
+
+        pitchSlider.addEventListener('input', (e) => {
+            pitchValue.textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
+        // Event listener for file input change
+        pdfFileInput.addEventListener('change', async (event) => {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                fileNameDisplay.textContent = `📄 ${selectedFile.name}`;
+                statusMessage.textContent = `Cargando PDF: ${selectedFile.name}...`;
+                
+                progressBarContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                
+                try {
+                    await loadPDF(selectedFile);
+                    await extractTextFromPDF();
+                    
+                    // Show controls
+                    voiceSettings.classList.remove('hidden');
+                    textPreviewContainer.classList.remove('hidden');
+                    controlButtons.classList.remove('hidden');
+                    
+                    statusMessage.textContent = `PDF cargado exitosamente. ${pdfDoc.numPages} página(s) procesada(s).`;
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                    statusMessage.textContent = `Error al cargar el PDF: ${error.message}`;
+                } finally {
+                    progressBarContainer.classList.add('hidden');
+                }
+            } else {
+                fileNameDisplay.textContent = '📄 Seleccionar Archivo PDF';
+                statusMessage.textContent = 'Ningún archivo seleccionado.';
+                voiceSettings.classList.add('hidden');
+                textPreviewContainer.classList.add('hidden');
+                controlButtons.classList.add('hidden');
+                audioPlayerContainer.classList.add('hidden');
+            }
+        });
+
+        // Load PDF file
+        async function loadPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            progressBar.style.width = '50%';
+        }
+
+        // Extract text from PDF
+        async function extractTextFromPDF() {
+            extractedText = '';
+            const totalPages = pdfDoc.numPages;
+            
+            for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                const page = await pdfDoc.getPage(pageNum);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                extractedText += pageText + '\n\n';
+                
+                // Update progress
+                const progress = 50 + (pageNum / totalPages) * 50;
+                progressBar.style.width = `${progress}%`;
+                statusMessage.textContent = `Extrayendo texto de página ${pageNum} de ${totalPages}...`;
+            }
+            
+            // Display extracted text
+            textPreview.textContent = extractedText.substring(0, 1000) + (extractedText.length > 1000 ? '...' : '');
+            progressBar.style.width = '100%';
+        }
+
+        // Play audio
+        playBtn.addEventListener('click', () => {
+            if (extractedText) {
+                playTextToSpeech();
+            }
+        });
+
+        // Pause audio
+        pauseBtn.addEventListener('click', () => {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.pause();
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+                statusMessage.textContent = 'Audio pausado.';
+            }
+        });
+
+        // Stop audio
+        stopBtn.addEventListener('click', () => {
+            speechSynthesis.cancel();
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+            statusMessage.textContent = 'Audio detenido.';
+        });
+
+        // Download audio
+        downloadBtn.addEventListener('click', () => {
+            if (audioBlob) {
+                const url = URL.createObjectURL(audioBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${selectedFile.name.split('.').slice(0, -1).join('.') || 'pdf_audio'}.mp3`;
+                a.click();
+                URL.revokeObjectURL(url);
+                statusMessage.textContent = 'Audio MP3 descargado exitosamente.';
+            } else {
+                statusMessage.textContent = 'No hay audio para descargar. Reproduce el audio primero.';
+            }
+        });
+
+        // Play text to speech
+        function playTextToSpeech() {
+            if (!extractedText) {
+                statusMessage.textContent = 'No hay texto para convertir a audio.';
+                return;
+            }
+
+            // Stop any current speech
+            speechSynthesis.cancel();
+
+            // Create new utterance
+            currentUtterance = new SpeechSynthesisUtterance(extractedText);
+            
+            // Set voice
+            const selectedVoiceIndex = voiceSelect.value;
+            if (selectedVoiceIndex) {
+                const voices = speechSynthesis.getVoices();
+                currentUtterance.voice = voices[selectedVoiceIndex];
+            }
+            
+            // Set speech parameters
+            currentUtterance.rate = parseFloat(rateSlider.value);
+            currentUtterance.volume = parseFloat(volumeSlider.value);
+            currentUtterance.pitch = parseFloat(pitchSlider.value);
+
+            // Event handlers
+            currentUtterance.onstart = () => {
+                playBtn.disabled = true;
+                pauseBtn.disabled = false;
+                stopBtn.disabled = false;
+                statusMessage.textContent = 'Reproduciendo audio...';
+                startAudioRecording();
+            };
+
+            currentUtterance.onend = () => {
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                statusMessage.textContent = 'Audio reproducido completamente.';
+                stopAudioRecording();
+            };
+
+            currentUtterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event.error);
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                statusMessage.textContent = `Error en la síntesis de voz: ${event.error}`;
+                stopAudioRecording();
+            };
+
+            // Start speech synthesis
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        // Start audio recording
+        async function startAudioRecording() {
+            try {
+                // Get audio context
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create a MediaStreamDestination to capture audio
+                const destination = audioContext.createMediaStreamDestination();
+                
+                // Create a gain node to control volume
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = parseFloat(volumeSlider.value);
+                
+                // Connect the gain node to the destination
+                gainNode.connect(destination);
+                
+                // Create MediaRecorder
+                mediaRecorder = new MediaRecorder(destination.stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    convertToMp3(audioBlob);
+                };
+                
+                // Start recording
+                mediaRecorder.start();
+                isRecording = true;
+                
+            } catch (error) {
+                console.error('Error starting audio recording:', error);
+                statusMessage.textContent = 'Error al iniciar la grabación de audio.';
+            }
+        }
+
+        // Stop audio recording
+        function stopAudioRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+        }
+
+        // Convert WebM to MP3 using lamejs
+        async function convertToMp3(webmBlob) {
+            try {
+                statusMessage.textContent = 'Convirtiendo audio a MP3...';
+                
+                // Create audio context to decode the WebM audio
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const arrayBuffer = await webmBlob.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                // Get audio data
+                const sampleRate = audioBuffer.sampleRate;
+                const length = audioBuffer.length;
+                const leftChannel = audioBuffer.getChannelData(0);
+                const rightChannel = audioBuffer.numberOfChannels > 1 ? audioBuffer.getChannelData(1) : leftChannel;
+                
+                // Convert float32 to int16
+                const leftData = new Int16Array(length);
+                const rightData = new Int16Array(length);
+                
+                for (let i = 0; i < length; i++) {
+                    leftData[i] = Math.max(-32768, Math.min(32767, leftChannel[i] * 32768));
+                    rightData[i] = Math.max(-32768, Math.min(32767, rightChannel[i] * 32768));
+                }
+                
+                // Create MP3 encoder
+                const mp3encoder = new lamejs.Mp3Encoder(2, sampleRate, 128); // 2 channels, sampleRate, 128kbps
+                const mp3Data = [];
+                
+                // Encode in chunks
+                const chunkSize = 1152; // MP3 frame size
+                for (let i = 0; i < length; i += chunkSize) {
+                    const leftChunk = leftData.subarray(i, i + chunkSize);
+                    const rightChunk = rightData.subarray(i, i + chunkSize);
+                    const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+                    if (mp3buf.length > 0) {
+                        mp3Data.push(mp3buf);
+                    }
+                }
+                
+                // Flush remaining data
+                const mp3buf = mp3encoder.flush();
+                if (mp3buf.length > 0) {
+                    mp3Data.push(mp3buf);
+                }
+                
+                // Create MP3 blob
+                const mp3Blob = new Blob(mp3Data, { type: 'audio/mpeg' });
+                audioBlob = mp3Blob;
+                
+                // Update UI
+                downloadBtn.disabled = false;
+                statusMessage.textContent = 'Audio MP3 listo para descargar.';
+                
+                // Show audio player
+                const audioUrl = URL.createObjectURL(mp3Blob);
+                audioPlayer.src = audioUrl;
+                audioPlayerContainer.classList.remove('hidden');
+                
+                // Update audio info
+                audioPlayer.onloadedmetadata = () => {
+                    audioDuration.textContent = formatDuration(audioPlayer.duration);
+                };
+                audioSize.textContent = formatFileSize(mp3Blob.size);
+                
+            } catch (error) {
+                console.error('Error converting to MP3:', error);
+                // Fallback to WebM if MP3 conversion fails
+                audioBlob = webmBlob;
+                downloadBtn.disabled = false;
+                statusMessage.textContent = 'Audio grabado (formato WebM).';
+                
+                const audioUrl = URL.createObjectURL(webmBlob);
+                audioPlayer.src = audioUrl;
+                audioPlayerContainer.classList.remove('hidden');
+                audioSize.textContent = formatFileSize(webmBlob.size);
+            }
+        }
+
+        // Format duration in MM:SS format
+        function formatDuration(seconds) {
+            if (isNaN(seconds)) return '--:--';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Handle resume from pause
+        speechSynthesis.onresume = () => {
+            playBtn.disabled = true;
+            pauseBtn.disabled = false;
+            stopBtn.disabled = false;
+            statusMessage.textContent = 'Audio reanudado.';
+        };
+
+        // Handle pause
+        speechSynthesis.onpause = () => {
+            playBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = false;
+            statusMessage.textContent = 'Audio pausado.';
+        };
+
+        // Initialize download button state
+        downloadBtn.disabled = true;
+    </script>
+</body>
+</html>

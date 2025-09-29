@@ -5,20 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extractor de Audio de Video</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #add8e6; /* Light blue background */
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        .header-brand {
+            font-family: 'Crimson Text', serif;
+            font-size: 0.8em; /* 20% smaller than original */
         }
         /* Custom styles for better visual appeal */
         .card {
             background-color: #ffffff;
             border-radius: 1rem; /* Rounded corners */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-            padding: 2.5rem;
+            padding: 1.5rem;
             max-width: 3xl; /* Max width for content */
             width: 95%; /* Responsive width */
+        }
+        
+        @media (min-width: 640px) {
+            .card {
+                padding: 2.5rem;
+            }
         }
         .btn-primary {
             background-color: #4f46e5; /* Indigo 600 */
@@ -40,12 +54,19 @@
             cursor: pointer;
             background-color: #e0e7ff; /* Indigo 100 */
             color: #4f46e5; /* Indigo 600 */
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             border-radius: 0.5rem;
             font-weight: 600;
             text-align: center;
             transition: background-color 0.2s ease-in-out;
             border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+            word-wrap: break-word;
+        }
+        
+        @media (min-width: 640px) {
+            .file-input-label {
+                padding: 0.75rem 1.5rem;
+            }
         }
         .file-input-label:hover {
             background-color: #c7d2fe; /* Indigo 200 */
@@ -72,34 +93,38 @@
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
-    <header class="w-full bg-indigo-700 text-white py-4 px-6 mb-8 rounded-b-lg shadow-lg">
-        <div class="max-w-3xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Extractor de Audio de Video</h1>
-            <div class="flex items-center space-x-4">
-                <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-3 py-1 rounded transition duration-200">Word ↔ PDF</a>
-                <a href="image-converter.html" class="text-white hover:bg-indigo-600 px-3 py-1 rounded transition duration-200">Imágenes</a>
-                <a href="pdf-editor.html" class="text-white hover:bg-indigo-600 px-3 py-1 rounded transition duration-200">Editor PDF</a>
-                <span class="text-lg font-semibold">Markmage</span>
+    <header class="w-full bg-indigo-700 text-white py-4 px-4 sm:px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="header-title text-lg sm:text-xl lg:text-2xl font-bold text-center sm:text-left">Extractor de Audio de Video</h1>
+                <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 lg:gap-4">
+                    <a href="homepage.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Inicio</a>
+                    <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Word ↔ PDF</a>
+                    <a href="image-converter.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Imágenes</a>
+                    <a href="pdf-editor.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Editor PDF</a>
+                    <a href="pdf-to-audio.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">PDF a Audio</a>
+                    <span class="header-brand text-xs sm:text-sm lg:text-base font-semibold hidden sm:inline">videotoaudiomp3.space</span>
+                </div>
             </div>
         </div>
     </header>
 
     <div class="card mx-auto text-center">
-        <h1 class="text-4xl font-extrabold text-gray-800 mb-6">
+        <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-gray-800 mb-4 sm:mb-6">
             Extractor de Audio de Video
         </h1>
-        <p class="text-gray-600 mb-8">
+        <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base px-2">
             Selecciona un archivo de video para extraer su pista de audio.
         </p>
 
-        <div class="mb-8">
+        <div class="mb-6 sm:mb-8">
             <input type="file" id="videoFileInput" accept="video/*" />
-            <label for="videoFileInput" class="file-input-label">
+            <label for="videoFileInput" class="file-input-label text-xs sm:text-sm lg:text-base">
                 <span id="fileNameDisplay">Seleccionar Video</span>
             </label>
         </div>
 
-        <button id="extractAudioBtn" class="btn-primary mb-8" disabled>
+        <button id="extractAudioBtn" class="btn-primary mb-6 sm:mb-8 text-xs sm:text-sm lg:text-base w-full sm:w-auto" disabled>
             Extraer Audio
         </button>
 
@@ -111,19 +136,38 @@
             </div>
 
         <div id="audioPlayerContainer" class="hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Audio Extraído</h2>
-            <audio id="audioPlayer" controls class="w-full rounded-lg shadow-inner"></audio>
-            <a id="downloadLink" class="inline-block mt-4 text-indigo-600 hover:text-indigo-800 font-medium" download="audio_extraido.wav" href="#">
-                Descargar Audio
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">Audio Extraído</h2>
+            <audio id="audioPlayer" controls class="w-full rounded-lg shadow-inner mb-4"></audio>
+            <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-200 font-medium text-sm sm:text-base w-full sm:w-auto" download="audio_extraido.wav" href="#">
+                📥 Descargar Audio
             </a>
         </div>
     </div>
 
-    <div class="mt-8 p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
-        <h3 class="text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
-        <p class="text-purple-700">Descubre otras herramientas útiles de Markmage. ¡Visita nuestro sitio web para más!</p>
-        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">Más Información</a>
+    <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
+        <h3 class="text-lg sm:text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
+        <p class="text-purple-700 text-sm sm:text-base">Descubre otras herramientas útiles de videotoaudiomp3.space. ¡Visita nuestro sitio web para más!</p>
+        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200 text-sm sm:text-base">Más Información</a>
     </div>
+
+    <!-- Footer -->
+    <footer class="w-full bg-indigo-900 text-white py-6 px-4 mt-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4">
+                <a href="homepage.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Inicio</a>
+                <a href="index.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Audio Extractor</a>
+                <a href="word-to-pdf.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Word ↔ PDF</a>
+                <a href="image-converter.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Imágenes</a>
+                <a href="pdf-editor.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Editor PDF</a>
+                <a href="pdf-to-audio.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">PDF a Audio</a>
+                <a href="terms-of-use.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Términos</a>
+                <a href="faq.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">FAQ</a>
+            </div>
+            <p class="text-xs sm:text-sm text-indigo-300">
+                © 2024 videotoaudiomp3.space. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
 
     <script>
         // Get references to HTML elements

@@ -5,20 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convertir Imágenes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #add8e6; /* Light blue background */
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        .header-brand {
+            font-family: 'Crimson Text', serif;
+            font-size: 0.8em; /* 20% smaller than original */
         }
         /* Custom styles for better visual appeal */
         .card {
             background-color: #ffffff;
             border-radius: 1rem; /* Rounded corners */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-            padding: 2.5rem;
+            padding: 1.5rem;
             max-width: 3xl; /* Max width for content */
             width: 95%; /* Responsive width */
+        }
+        
+        @media (min-width: 640px) {
+            .card {
+                padding: 2.5rem;
+            }
         }
         .btn-primary {
             background-color: #4f46e5; /* Indigo 600 */
@@ -40,12 +54,19 @@
             cursor: pointer;
             background-color: #e0e7ff; /* Indigo 100 */
             color: #4f46e5; /* Indigo 600 */
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             border-radius: 0.5rem;
             font-weight: 600;
             text-align: center;
             transition: background-color 0.2s ease-in-out;
             border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+            word-wrap: break-word;
+        }
+        
+        @media (min-width: 640px) {
+            .file-input-label {
+                padding: 0.75rem 1.5rem;
+            }
         }
         .file-input-label:hover {
             background-color: #c7d2fe; /* Indigo 200 */
@@ -84,71 +105,81 @@
         /* Image preview styles */
         .image-preview {
             max-width: 100%;
-            max-height: 300px;
+            max-height: 200px;
             border-radius: 0.5rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin: 1rem 0;
         }
+        
+        @media (min-width: 640px) {
+            .image-preview {
+                max-height: 300px;
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
-    <header class="w-full bg-indigo-700 text-white py-4 px-6 mb-8 rounded-b-lg shadow-lg">
-        <div class="max-w-3xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Conversor de Imágenes</h1>
-            <div class="flex items-center space-x-4">
-                <a href="index.html" class="nav-link text-white hover:bg-indigo-600">Audio Extractor</a>
-                <a href="word-to-pdf.html" class="nav-link text-white hover:bg-indigo-600">Word ↔ PDF</a>
-                <a href="pdf-editor.html" class="nav-link text-white hover:bg-indigo-600">Editor PDF</a>
-                <span class="text-lg font-semibold">Markmage</span>
+    <header class="w-full bg-indigo-700 text-white py-4 px-4 sm:px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="header-title text-lg sm:text-xl lg:text-2xl font-bold text-center sm:text-left">Conversor de Imágenes</h1>
+                <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 lg:gap-4">
+                    <a href="homepage.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Inicio</a>
+                    <a href="index.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Audio Extractor</a>
+                    <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Word ↔ PDF</a>
+                    <a href="pdf-editor.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Editor PDF</a>
+                    <a href="pdf-to-audio.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">PDF a Audio</a>
+                    <span class="header-brand text-xs sm:text-sm lg:text-base font-semibold hidden sm:inline">videotoaudiomp3.space</span>
+                </div>
             </div>
         </div>
     </header>
 
     <div class="card mx-auto text-center">
-        <div class="mb-6">
-            <h1 class="text-4xl font-extrabold text-gray-800 mb-4">
+        <div class="mb-4 sm:mb-6">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-gray-800 mb-4">
                 <span id="mainTitle">Convertir JPG a PNG</span>
             </h1>
-            <div class="flex items-center justify-center space-x-4 mb-4">
-                <span id="fromLabel" class="text-sm font-medium text-gray-600">JPG</span>
+            <div class="flex items-center justify-center space-x-2 sm:space-x-4 mb-4">
+                <span id="fromLabel" class="text-xs sm:text-sm font-medium text-gray-600">JPG</span>
                 <button id="swapBtn" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 p-2 rounded-full transition duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                     </svg>
                 </button>
-                <span id="toLabel" class="text-sm font-medium text-gray-600">PNG</span>
+                <span id="toLabel" class="text-xs sm:text-sm font-medium text-gray-600">PNG</span>
             </div>
         </div>
-        <p class="text-gray-600 mb-8">
+        <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base px-2">
             <span id="descriptionText">Selecciona una imagen JPG para convertirla a PNG.</span>
         </p>
 
-        <div class="mb-8">
+        <div class="mb-6 sm:mb-8">
             <input type="file" id="imageInput" accept=".jpg,.jpeg,.png" />
-            <label for="imageInput" class="file-input-label">
+            <label for="imageInput" class="file-input-label text-xs sm:text-sm lg:text-base">
                 <span id="fileNameDisplay">Seleccionar Imagen JPG</span>
             </label>
         </div>
 
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Opciones de conversión:</label>
-            <div id="conversionOptions" class="flex flex-col sm:flex-row gap-4 justify-center">
-                <label class="flex items-center">
+        <div class="mb-4 sm:mb-6">
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Opciones de conversión:</label>
+            <div id="conversionOptions" class="flex flex-col gap-2 sm:gap-4 justify-center">
+                <label class="flex items-center justify-center sm:justify-start">
                     <input type="checkbox" id="preserveQuality" checked class="mr-2">
-                    <span class="text-sm text-gray-600">Preservar calidad</span>
+                    <span class="text-xs sm:text-sm text-gray-600">Preservar calidad</span>
                 </label>
-                <label class="flex items-center">
+                <label class="flex items-center justify-center sm:justify-start">
                     <input type="checkbox" id="optimizeSize" class="mr-2">
-                    <span class="text-sm text-gray-600">Optimizar tamaño</span>
+                    <span class="text-xs sm:text-sm text-gray-600">Optimizar tamaño</span>
                 </label>
-                <label class="flex items-center">
+                <label class="flex items-center justify-center sm:justify-start">
                     <input type="checkbox" id="removeBackground" class="mr-2">
-                    <span class="text-sm text-gray-600">Remover fondo (PNG)</span>
+                    <span class="text-xs sm:text-sm text-gray-600">Remover fondo (PNG)</span>
                 </label>
             </div>
         </div>
 
-        <button id="convertBtn" class="btn-primary mb-8" disabled>
+        <button id="convertBtn" class="btn-primary mb-6 sm:mb-8 text-xs sm:text-sm lg:text-base w-full sm:w-auto" disabled>
             <span id="convertBtnText">Convertir a PNG</span>
         </button>
 
@@ -156,45 +187,64 @@
             <div id="progressBar" class="progress-bar"></div>
         </div>
 
-        <div id="statusMessage" class="text-sm text-gray-700 mb-6">
+        <div id="statusMessage" class="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6">
         </div>
 
         <!-- Image Preview Section -->
-        <div id="imagePreviewContainer" class="hidden mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Vista Previa</h3>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-2">Original</p>
-                    <img id="originalImage" class="image-preview" alt="Imagen original">
+        <div id="imagePreviewContainer" class="hidden mb-4 sm:mb-6">
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 mb-2">Vista Previa</h3>
+            <div class="flex flex-col gap-4 justify-center items-center">
+                <div class="text-center w-full">
+                    <p class="text-xs sm:text-sm text-gray-600 mb-2">Original</p>
+                    <img id="originalImage" class="image-preview w-full max-w-xs sm:max-w-sm" alt="Imagen original">
                 </div>
-                <div class="text-2xl text-gray-400">→</div>
-                <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-2">Convertida</p>
-                    <img id="convertedImage" class="image-preview" alt="Imagen convertida">
+                <div class="text-lg sm:text-xl lg:text-2xl text-gray-400">↓</div>
+                <div class="text-center w-full">
+                    <p class="text-xs sm:text-sm text-gray-600 mb-2">Convertida</p>
+                    <img id="convertedImage" class="image-preview w-full max-w-xs sm:max-w-sm" alt="Imagen convertida">
                 </div>
             </div>
         </div>
 
         <div id="downloadContainer" class="hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">
                 <span id="downloadTitle">PNG Generado</span>
             </h2>
-            <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                <p class="text-sm text-gray-600 mb-2">
+            <div class="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4">
+                <p class="text-xs sm:text-sm text-gray-600 mb-2">
                     <span id="downloadDescription">Tu imagen PNG está listo para descargar</span>
                 </p>
-                <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition duration-200 font-medium" download="imagen.png" href="#">
+                <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-4 sm:px-6 rounded-md hover:bg-green-700 transition duration-200 font-medium text-xs sm:text-sm lg:text-base w-full sm:w-auto text-center" download="imagen.png" href="#">
                     <span id="downloadButtonText">🖼️ Descargar PNG</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="mt-8 p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
-        <h3 class="text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
-        <p class="text-purple-700">Descubre otras herramientas útiles de Markmage. ¡Visita nuestro sitio web para más!</p>
-        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">Más Información</a>
+    <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
+        <h3 class="text-lg sm:text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
+        <p class="text-purple-700 text-sm sm:text-base">Descubre otras herramientas útiles de videotoaudiomp3.space. ¡Visita nuestro sitio web para más!</p>
+        <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200 text-sm sm:text-base">Más Información</a>
     </div>
+
+    <!-- Footer -->
+    <footer class="w-full bg-indigo-900 text-white py-6 px-4 mt-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4">
+                <a href="homepage.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Inicio</a>
+                <a href="index.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Audio Extractor</a>
+                <a href="word-to-pdf.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Word ↔ PDF</a>
+                <a href="image-converter.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Imágenes</a>
+                <a href="pdf-editor.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Editor PDF</a>
+                <a href="pdf-to-audio.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">PDF a Audio</a>
+                <a href="terms-of-use.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Términos</a>
+                <a href="faq.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">FAQ</a>
+            </div>
+            <p class="text-xs sm:text-sm text-indigo-300">
+                © 2024 videotoaudiomp3.space. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
 
     <script>
         // Get references to HTML elements

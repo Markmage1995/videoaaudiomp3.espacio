@@ -7,20 +7,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #add8e6; /* Light blue background */
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.8em; /* 20% smaller than original */
+        }
+        .header-brand {
+            font-family: 'Crimson Text', serif;
+            font-size: 0.8em; /* 20% smaller than original */
         }
         /* Custom styles for better visual appeal */
         .card {
             background-color: #ffffff;
             border-radius: 1rem; /* Rounded corners */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-            padding: 2.5rem;
+            padding: 1.5rem;
             max-width: 3xl; /* Max width for content */
             width: 95%; /* Responsive width */
+        }
+        
+        @media (min-width: 640px) {
+            .card {
+                padding: 2.5rem;
+            }
         }
         .btn-primary {
             background-color: #4f46e5; /* Indigo 600 */
@@ -66,12 +80,19 @@
             cursor: pointer;
             background-color: #e0e7ff; /* Indigo 100 */
             color: #4f46e5; /* Indigo 600 */
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 1rem;
             border-radius: 0.5rem;
             font-weight: 600;
             text-align: center;
             transition: background-color 0.2s ease-in-out;
             border: 2px dashed #c7d2fe; /* Indigo 200 dashed border */
+            word-wrap: break-word;
+        }
+        
+        @media (min-width: 640px) {
+            .file-input-label {
+                padding: 0.75rem 1.5rem;
+            }
         }
         .file-input-label:hover {
             background-color: #c7d2fe; /* Indigo 200 */
@@ -98,7 +119,7 @@
         /* PDF viewer styles */
         .pdf-viewer {
             width: 100%;
-            height: 600px;
+            height: 400px;
             border: 2px solid #e5e7eb;
             border-radius: 0.5rem;
             background-color: #f9fafb;
@@ -106,9 +127,76 @@
             align-items: center;
             justify-content: center;
             color: #6b7280;
-            font-size: 1.125rem;
+            font-size: 1rem;
             position: relative;
             overflow: auto;
+        }
+        
+        @media (min-width: 640px) {
+            .pdf-viewer {
+                height: 500px;
+                font-size: 1.125rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .pdf-viewer {
+                height: 70vh;
+                min-height: 600px;
+                max-height: 800px;
+            }
+        }
+        
+        /* PDF page container for better fitting */
+        .pdf-page-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+        
+        /* Scale controls */
+        .scale-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scale-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .scale-btn:hover {
+            background: #4338ca;
+        }
+        
+        .scale-btn:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+        }
+        
+        .scale-indicator {
+            font-size: 0.75rem;
+            color: #374151;
+            min-width: 50px;
+            text-align: center;
         }
         .pdf-page {
             margin: 10px;
@@ -183,6 +271,83 @@
             border-color: #10b981;
             background-color: rgba(16, 185, 129, 0.2);
         }
+        .text-annotation.editable {
+            cursor: text;
+        }
+        .text-annotation.editable:hover {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        
+        /* Text editing overlay */
+        .text-edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .text-edit-modal {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .text-edit-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .text-edit-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+        
+        .text-edit-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .text-edit-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .text-edit-btn.save {
+            background: #10b981;
+            color: white;
+        }
+        
+        .text-edit-btn.save:hover {
+            background: #059669;
+        }
+        
+        .text-edit-btn.cancel {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .text-edit-btn.cancel:hover {
+            background: #4b5563;
+        }
         /* Style toolbar */
         .style-toolbar {
             background-color: #f8fafc;
@@ -254,30 +419,34 @@
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
-    <header class="w-full bg-indigo-700 text-white py-4 px-6 mb-8 rounded-b-lg shadow-lg">
-        <div class="max-w-3xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Editor de PDF</h1>
-            <div class="flex items-center space-x-4">
-                <a href="index.html" class="text-white hover:bg-indigo-600 px-3 py-1 rounded transition duration-200">Audio Extractor</a>
-                <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-3 py-1 rounded transition duration-200">Word ↔ PDF</a>
-                <a href="image-converter.html" class="text-white hover:bg-indigo-600 px-3 py-1 rounded transition duration-200">Imágenes</a>
-                <span class="text-lg font-semibold">Markmage</span>
+    <header class="w-full bg-indigo-700 text-white py-4 px-4 sm:px-6 mb-8 rounded-b-lg shadow-lg">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h1 class="header-title text-lg sm:text-xl lg:text-2xl font-bold text-center sm:text-left">Editor de PDF</h1>
+                <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-2 lg:gap-4">
+                    <a href="homepage.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Inicio</a>
+                    <a href="index.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Audio Extractor</a>
+                    <a href="word-to-pdf.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Word ↔ PDF</a>
+                    <a href="image-converter.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">Imágenes</a>
+                    <a href="pdf-to-audio.html" class="text-white hover:bg-indigo-600 px-2 py-1 rounded transition duration-200 text-xs sm:text-sm lg:text-base">PDF a Audio</a>
+                    <span class="header-brand text-xs sm:text-sm lg:text-base font-semibold hidden sm:inline">videotoaudiomp3.space</span>
+                </div>
             </div>
         </div>
     </header>
 
     <div class="card mx-auto text-center">
-        <h1 class="text-4xl font-extrabold text-gray-800 mb-6">
+        <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-gray-800 mb-4 sm:mb-6">
             Editor de PDF Profesional
         </h1>
-        <p class="text-gray-600 mb-8">
+        <p class="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base px-2">
             Sube un PDF para editarlo, agregar anotaciones, combinar páginas o dividir documentos.
         </p>
 
         <!-- File Upload Section -->
-        <div class="mb-8">
+        <div class="mb-6 sm:mb-8">
             <input type="file" id="pdfFileInput" accept=".pdf" />
-            <label for="pdfFileInput" class="file-input-label">
+            <label for="pdfFileInput" class="file-input-label text-xs sm:text-sm lg:text-base">
                 <span id="fileNameDisplay">📄 Seleccionar Archivo PDF</span>
             </label>
         </div>
@@ -290,13 +459,16 @@
 
         <!-- Toolbar -->
         <div id="toolbar" class="toolbar hidden">
-            <h3 class="text-lg font-semibold text-gray-800 w-full mb-2">Herramientas de Edición</h3>
-            <button id="addTextBtn" class="btn-secondary">📝 Agregar Texto</button>
-            <button id="highlightBtn" class="btn-secondary">🖍️ Resaltar</button>
-            <button id="drawBtn" class="btn-secondary">✏️ Dibujar</button>
-            <button id="addStickyNoteBtn" class="btn-secondary">📌 Nota Adhesiva</button>
-            <button id="rotatePageBtn" class="btn-secondary">🔄 Rotar Página</button>
-            <button id="deletePageBtn" class="btn-danger">🗑️ Eliminar Página</button>
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 w-full mb-2">Herramientas de Edición</h3>
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 justify-center">
+                <button id="addTextBtn" class="btn-secondary text-xs sm:text-sm">📝 Agregar Texto</button>
+                <button id="editTextBtn" class="btn-secondary text-xs sm:text-sm">✏️ Editar Texto</button>
+                <button id="highlightBtn" class="btn-secondary text-xs sm:text-sm">🖍️ Resaltar</button>
+                <button id="drawBtn" class="btn-secondary text-xs sm:text-sm">✏️ Dibujar</button>
+                <button id="addStickyNoteBtn" class="btn-secondary text-xs sm:text-sm">📌 Nota Adhesiva</button>
+                <button id="rotatePageBtn" class="btn-secondary text-xs sm:text-sm">🔄 Rotar Página</button>
+                <button id="deletePageBtn" class="btn-danger text-xs sm:text-sm col-span-2 sm:col-span-1">🗑️ Eliminar Página</button>
+            </div>
         </div>
 
         <!-- Style Toolbar -->
@@ -346,41 +518,49 @@
 
         <!-- PDF Viewer -->
         <div id="pdfViewerContainer" class="hidden mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800">Vista Previa del PDF</h3>
-                <div class="flex items-center space-x-2">
-                    <button id="prevPageBtn" class="btn-secondary" disabled>← Anterior</button>
-                    <span id="pageInfo" class="text-sm text-gray-600">Página 1 de 1</span>
-                    <button id="nextPageBtn" class="btn-secondary" disabled>Siguiente →</button>
+            <div class="flex flex-col sm:flex-row items-center justify-between mb-4 gap-2">
+                <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800">Vista Previa del PDF</h3>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <button id="prevPageBtn" class="btn-secondary text-xs sm:text-sm" disabled>← Anterior</button>
+                    <span id="pageInfo" class="text-xs sm:text-sm text-gray-600">Página 1 de 1</span>
+                    <button id="nextPageBtn" class="btn-secondary text-xs sm:text-sm" disabled>Siguiente →</button>
                 </div>
             </div>
             <div id="pdfViewer" class="pdf-viewer">
-                <div class="text-center">
-                    <div class="text-4xl mb-2">📄</div>
-                    <p>Selecciona un archivo PDF para comenzar</p>
-                    <p class="text-sm mt-2">Las funciones de edición aparecerán una vez cargado el PDF</p>
+                <div class="scale-controls hidden" id="scaleControls">
+                    <button id="zoomOutBtn" class="scale-btn">-</button>
+                    <span id="scaleIndicator" class="scale-indicator">100%</span>
+                    <button id="zoomInBtn" class="scale-btn">+</button>
+                    <button id="fitToWidthBtn" class="scale-btn">Fit</button>
+                </div>
+                <div class="pdf-page-container">
+                    <div class="text-center">
+                        <div class="text-4xl mb-2">📄</div>
+                        <p>Selecciona un archivo PDF para comenzar</p>
+                        <p class="text-sm mt-2">Las funciones de edición aparecerán una vez cargado el PDF</p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Annotation Tools -->
         <div id="annotationTools" class="annotation-tools hidden">
-            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Herramientas de Anotación</h3>
-            <div class="flex flex-wrap gap-2 justify-center">
-                <button id="saveAnnotationsBtn" class="btn-primary">💾 Guardar Anotaciones</button>
-                <button id="clearAnnotationsBtn" class="btn-secondary">🗑️ Limpiar Todo</button>
-                <button id="exportAnnotationsBtn" class="btn-secondary">📤 Exportar</button>
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-yellow-800 mb-2">Herramientas de Anotación</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 justify-center">
+                <button id="saveAnnotationsBtn" class="btn-primary text-xs sm:text-sm">💾 Guardar Anotaciones</button>
+                <button id="clearAnnotationsBtn" class="btn-secondary text-xs sm:text-sm">🗑️ Limpiar Todo</button>
+                <button id="exportAnnotationsBtn" class="btn-secondary text-xs sm:text-sm">📤 Exportar</button>
             </div>
         </div>
 
         <!-- Page Management -->
         <div id="pageManagement" class="hidden mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Gestión de Páginas</h3>
-            <div class="flex flex-wrap gap-2 justify-center">
-                <button id="mergePdfBtn" class="btn-primary">🔗 Combinar PDFs</button>
-                <button id="splitPdfBtn" class="btn-primary">✂️ Dividir PDF</button>
-                <button id="reorderPagesBtn" class="btn-secondary">📋 Reordenar</button>
-                <button id="extractPagesBtn" class="btn-secondary">📄 Extraer Páginas</button>
+            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 mb-4">Gestión de Páginas</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 justify-center">
+                <button id="mergePdfBtn" class="btn-primary text-xs sm:text-sm">🔗 Combinar PDFs</button>
+                <button id="splitPdfBtn" class="btn-primary text-xs sm:text-sm">✂️ Dividir PDF</button>
+                <button id="reorderPagesBtn" class="btn-secondary text-xs sm:text-sm">📋 Reordenar</button>
+                <button id="extractPagesBtn" class="btn-secondary text-xs sm:text-sm">📄 Extraer Páginas</button>
             </div>
         </div>
 
@@ -395,12 +575,12 @@
 
         <!-- Download Section -->
         <div id="downloadContainer" class="hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">PDF Editado Listo</h2>
+            <h2 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 mb-4">PDF Editado Listo</h2>
             <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                <p class="text-sm text-gray-600 mb-2">
+                <p class="text-xs sm:text-sm text-gray-600 mb-2">
                     Tu PDF editado está listo para descargar
                 </p>
-                <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 transition duration-200 font-medium" download="pdf_editado.pdf" href="#">
+                <a id="downloadLink" class="inline-block bg-green-600 text-white py-2 px-4 sm:px-6 rounded-md hover:bg-green-700 transition duration-200 font-medium text-xs sm:text-sm lg:text-base w-full sm:w-auto text-center" download="pdf_editado.pdf" href="#">
                     📄 Descargar PDF Editado
                 </a>
             </div>
@@ -409,9 +589,28 @@
 
     <div class="mt-8 p-6 bg-purple-200 border border-purple-400 rounded-lg shadow-md text-center max-w-xl w-full">
         <h3 class="text-xl font-semibold text-purple-800 mb-2">¡Anuncio Especial!</h3>
-        <p class="text-purple-700">Descubre otras herramientas útiles de Markmage. ¡Visita nuestro sitio web para más!</p>
+        <p class="text-purple-700">Descubre otras herramientas útiles de videotoaudiomp3.space. ¡Visita nuestro sitio web para más!</p>
         <a href="#" class="inline-block mt-4 bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200">Más Información</a>
     </div>
+
+    <!-- Footer -->
+    <footer class="w-full bg-indigo-900 text-white py-6 px-4 mt-8">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-4">
+                <a href="homepage.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Inicio</a>
+                <a href="index.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Audio Extractor</a>
+                <a href="word-to-pdf.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Word ↔ PDF</a>
+                <a href="image-converter.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Imágenes</a>
+                <a href="pdf-editor.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Editor PDF</a>
+                <a href="pdf-to-audio.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">PDF a Audio</a>
+                <a href="terms-of-use.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">Términos</a>
+                <a href="faq.html" class="text-indigo-200 hover:text-white transition duration-200 text-xs sm:text-sm">FAQ</a>
+            </div>
+            <p class="text-xs sm:text-sm text-indigo-300">
+                © 2024 videotoaudiomp3.space. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
 
     <script>
         // Get references to HTML elements
@@ -440,9 +639,15 @@
         const textStyle = document.getElementById('textStyle');
         const applyStyleBtn = document.getElementById('applyStyleBtn');
         const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        const scaleControls = document.getElementById('scaleControls');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const fitToWidthBtn = document.getElementById('fitToWidthBtn');
+        const scaleIndicator = document.getElementById('scaleIndicator');
 
         // Tool buttons
         const addTextBtn = document.getElementById('addTextBtn');
+        const editTextBtn = document.getElementById('editTextBtn');
         const highlightBtn = document.getElementById('highlightBtn');
         const drawBtn = document.getElementById('drawBtn');
         const addStickyNoteBtn = document.getElementById('addStickyNoteBtn');
@@ -468,6 +673,8 @@
         let selectedAnnotation = null;
         let isDragging = false;
         let dragOffset = { x: 0, y: 0 };
+        let currentScale = 1.5;
+        let isEditTextMode = false;
 
         // Initialize PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -540,7 +747,7 @@
         // Render PDF page
         async function renderPage(pageNum) {
             const page = await pdfDoc.getPage(pageNum);
-            const viewport = page.getViewport({ scale: scale });
+            const viewport = page.getViewport({ scale: currentScale });
             
             // Create canvas
             const canvas = document.createElement('canvas');
@@ -548,13 +755,16 @@
             canvas.height = viewport.height;
             canvas.width = viewport.width;
             
-            // Clear viewer
-            pdfViewer.innerHTML = '';
+            // Clear viewer content but keep scale controls
+            const pageContainer = pdfViewer.querySelector('.pdf-page-container');
+            pageContainer.innerHTML = '';
             
             // Create page container
-            const pageContainer = document.createElement('div');
-            pageContainer.className = 'pdf-page';
-            pageContainer.style.position = 'relative';
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'pdf-page';
+            pageDiv.style.position = 'relative';
+            pageDiv.style.transform = 'scale(1)';
+            pageDiv.style.transformOrigin = 'top left';
             
             // Create annotation layer
             const annotationLayer = document.createElement('div');
@@ -562,9 +772,13 @@
             annotationLayer.style.width = viewport.width + 'px';
             annotationLayer.style.height = viewport.height + 'px';
             
-            pageContainer.appendChild(canvas);
-            pageContainer.appendChild(annotationLayer);
-            pdfViewer.appendChild(pageContainer);
+            pageDiv.appendChild(canvas);
+            pageDiv.appendChild(annotationLayer);
+            pageContainer.appendChild(pageDiv);
+            
+            // Show scale controls
+            scaleControls.classList.remove('hidden');
+            updateScaleIndicator();
             
             // Render page
             const renderContext = {
@@ -590,6 +804,38 @@
             nextPageBtn.disabled = currentPage >= totalPages;
         }
 
+        // Update scale indicator
+        function updateScaleIndicator() {
+            scaleIndicator.textContent = Math.round(currentScale * 100) + '%';
+        }
+
+        // Zoom in
+        async function zoomIn() {
+            if (currentScale < 3) {
+                currentScale += 0.25;
+                await renderPage(currentPage);
+            }
+        }
+
+        // Zoom out
+        async function zoomOut() {
+            if (currentScale > 0.5) {
+                currentScale -= 0.25;
+                await renderPage(currentPage);
+            }
+        }
+
+        // Fit to width
+        async function fitToWidth() {
+            if (pdfDoc) {
+                const page = await pdfDoc.getPage(currentPage);
+                const viewerWidth = pdfViewer.offsetWidth - 40; // Account for padding
+                const pageWidth = page.view[2];
+                currentScale = viewerWidth / pageWidth;
+                await renderPage(currentPage);
+            }
+        }
+
         // Page navigation event listeners
         prevPageBtn.addEventListener('click', async () => {
             if (currentPage > 1) {
@@ -606,6 +852,11 @@
                 await renderPage(currentPage);
             }
         });
+
+        // Scale control event listeners
+        zoomInBtn.addEventListener('click', zoomIn);
+        zoomOutBtn.addEventListener('click', zoomOut);
+        fitToWidthBtn.addEventListener('click', fitToWidth);
 
         // Display PDF information
         function displayPdfInfo(file) {
@@ -683,6 +934,7 @@
                 element.textContent = annotation.text || 'Nota adhesiva';
             } else if (annotation.type === 'text') {
                 element.textContent = annotation.text || 'Texto';
+                element.classList.add('editable');
                 
                 // Apply text styling if available
                 if (annotation.fontSize) element.style.fontSize = annotation.fontSize + 'px';
@@ -695,10 +947,14 @@
                 // Add drag functionality
                 addDragListeners(element, annotation);
                 
-                // Add click to select
+                // Add click to select or edit
                 element.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    selectAnnotation(element, annotation);
+                    if (isEditTextMode) {
+                        editTextAnnotation(element, annotation);
+                    } else {
+                        selectAnnotation(element, annotation);
+                    }
                 });
                 
             } else if (annotation.type === 'highlight') {
@@ -949,27 +1205,103 @@
             drawingPoints = [];
         }
 
+        // Edit text annotation
+        function editTextAnnotation(element, annotation) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'text-edit-overlay';
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'text-edit-modal';
+            
+            modal.innerHTML = `
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Editar Texto</h3>
+                <input type="text" class="text-edit-input" value="${annotation.text}" placeholder="Ingresa el nuevo texto">
+                <div class="text-edit-buttons">
+                    <button class="text-edit-btn cancel">Cancelar</button>
+                    <button class="text-edit-btn save">Guardar</button>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // Focus input
+            const input = modal.querySelector('.text-edit-input');
+            input.focus();
+            input.select();
+            
+            // Event listeners
+            modal.querySelector('.cancel').addEventListener('click', () => {
+                document.body.removeChild(overlay);
+            });
+            
+            modal.querySelector('.save').addEventListener('click', () => {
+                const newText = input.value.trim();
+                if (newText) {
+                    annotation.text = newText;
+                    element.textContent = newText;
+                    
+                    // Update width based on new text
+                    const textWidth = newText.length * (annotation.fontSize * 0.6);
+                    element.style.width = Math.max(textWidth + 16, 50) + 'px';
+                    annotation.width = parseInt(element.style.width);
+                    
+                    statusMessage.textContent = `Texto actualizado: "${newText}"`;
+                }
+                document.body.removeChild(overlay);
+            });
+            
+            // Close on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(overlay);
+                }
+            });
+            
+            // Close on escape key
+            const handleKeyPress = (e) => {
+                if (e.key === 'Escape') {
+                    document.body.removeChild(overlay);
+                    document.removeEventListener('keydown', handleKeyPress);
+                }
+            };
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
         // Tool event listeners
         addTextBtn.addEventListener('click', () => {
             currentMode = 'text';
+            isEditTextMode = false;
             statusMessage.textContent = 'Modo: Agregar texto. Haz clic en el PDF para agregar texto.';
+            updateToolButtons();
+        });
+
+        editTextBtn.addEventListener('click', () => {
+            currentMode = 'edit';
+            isEditTextMode = true;
+            statusMessage.textContent = 'Modo: Editar texto. Haz clic en cualquier texto existente para editarlo.';
             updateToolButtons();
         });
 
         highlightBtn.addEventListener('click', () => {
             currentMode = 'highlight';
+            isEditTextMode = false;
             statusMessage.textContent = 'Modo: Resaltar. Selecciona texto para resaltar.';
             updateToolButtons();
         });
 
         drawBtn.addEventListener('click', () => {
             currentMode = 'draw';
+            isEditTextMode = false;
             statusMessage.textContent = 'Modo: Dibujar. Dibuja sobre el PDF.';
             updateToolButtons();
         });
 
         addStickyNoteBtn.addEventListener('click', () => {
             currentMode = 'sticky';
+            isEditTextMode = false;
             statusMessage.textContent = 'Modo: Nota adhesiva. Haz clic en el PDF para agregar una nota.';
             updateToolButtons();
         });
@@ -1094,7 +1426,7 @@
         // Update tool button states
         function updateToolButtons() {
             // Reset all buttons
-            [addTextBtn, highlightBtn, drawBtn, addStickyNoteBtn].forEach(btn => {
+            [addTextBtn, editTextBtn, highlightBtn, drawBtn, addStickyNoteBtn].forEach(btn => {
                 btn.classList.remove('bg-indigo-600');
                 btn.classList.add('bg-gray-500');
             });
@@ -1104,6 +1436,10 @@
                 case 'text':
                     addTextBtn.classList.remove('bg-gray-500');
                     addTextBtn.classList.add('bg-indigo-600');
+                    break;
+                case 'edit':
+                    editTextBtn.classList.remove('bg-gray-500');
+                    editTextBtn.classList.add('bg-indigo-600');
                     break;
                 case 'highlight':
                     highlightBtn.classList.remove('bg-gray-500');
